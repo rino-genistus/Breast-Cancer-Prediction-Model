@@ -163,6 +163,12 @@ y_pred_best_rf_RS = best_rf_RS.predict(X_test)
 accuracy_score_best_rf_RS = accuracy_score(Y_test, y_pred_best_rf_RS)
 print(f"Best RF accuracy score: {accuracy_score_best_rf_RS}")
 
+precision_score_best_rf_RS = precision_score(Y_test, y_pred_best_rf_RS)
+print(f"Best RF precision score: {precision_score_best_rf_RS}")
+
+recall_score_best_rf_RS = recall_score(Y_test, y_pred_best_rf_RS)
+print(f"Best RF Recall score: {recall_score_best_rf_RS}")
+
 cnf_matrix_best_rf_RS = metrics.confusion_matrix(Y_test, y_pred_best_rf_RS)
 print(f"Best RF Confusion Matrix: \n{cnf_matrix_best_rf_RS}")
 
