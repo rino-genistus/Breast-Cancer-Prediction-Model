@@ -22,6 +22,11 @@ from sklearn.tree import export_graphviz
 from IPython.display import Image
 import graphviz
 from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import classification_report
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
 
 
 data = pd.read_csv('C:/Users/rinog/Downloads/archive/data.csv')
@@ -175,3 +180,18 @@ print(f"Best RF Confusion Matrix: \n{cnf_matrix_best_rf_RS}")
 #Confusion Matrix Plot
 ConfusionMatrixDisplay(confusion_matrix=cnf_matrix_best_rf_RS).plot()
 #plt.show()
+
+
+#Gradient Boosting Algorithm
+categorical_features = X.select_dtypes(include=["object"]).columns.to_list()
+numerical_features = X.select_dtypes(include=["float64", "int64"]).columns.to_list()
+
+preprocessor = ColumnTransformer(transformers=[("cat", OneHotEncoder(), categorical_features), ("num", StandardScaler(), numerical_features)])
+
+pipeline = Pipeline([("preprocessor", preprocessor),("classifier", GradientBoostingClassifier(random_state=65, learning_rate=0.1, n_estimators=100, min_samples_leaf=3))])
+pipeline.fit(X_train, Y_train)
+Y_pred_GradientBoosting = pipeline.predict(X_test)
+GBoost_report = classification_report(Y_test, Y_pred_GradientBoosting)
+print(f"Classification Report \n")
+print(GBoost_report)
+print(f"GBoost accuracy: {accuracy_score(Y_test, Y_pred_GradientBoosting)}")
