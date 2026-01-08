@@ -18,7 +18,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
-data = pd.read_csv('C:/Users/rinog/Downloads/archive/data.csv')
+data = pd.read_csv('../data/data.csv')
 #print(f"Data.head(): {data.head()}")
 #print(f"Data.info(): {data.info()}")
 #print(f"Data.describe(): {data.describe()}")
