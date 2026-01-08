@@ -1,12 +1,4 @@
-#Plan is to first use K-Nearest Neighbors for classification
-#Can try to use Support Vector Machines if need be
-#Use pytorch in the beginning for the classification tasks
-#Next try to hard code it
-#PLAN CHANGE: Going to try using logistic regression for right now
-
-
 import pandas as pd
-import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -18,9 +10,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, ConfusionMatrixDisplay
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import randint
-from sklearn.tree import export_graphviz
-from IPython.display import Image
-import graphviz
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingClassifier
@@ -42,31 +31,47 @@ Y = data['diagnosis'].map({'M':1, "B":0})
 X_train,X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.2, random_state=55, stratify=Y)
 
 scaler = StandardScaler()
+LReg = LogisticRegression(random_state=55, max_iter=1000)
+
+LReg.fit(X_train, Y_train)
+y_pred_LReg_PreScale = LReg.predict(X_test)
+accuracy_score_LReg_PreScale = accuracy_score(Y_test, y_pred_LReg_PreScale)
+recall_score_LReg_PreScale = recall_score(Y_test, y_pred_LReg_PreScale)
+precision_score_LReg_PreScale = precision_score(Y_test, y_pred_LReg_PreScale)
+cnf_matrix_PreScale_LReg = metrics.confusion_matrix(Y_test, y_pred_LReg_PreScale)
+print(f"Logistic Regression Pre-scaling Accuracy: {accuracy_score_LReg_PreScale}")
+print(f"Logistic Regression Pre-scaling Recall Score: {recall_score_LReg_PreScale}")
+print(f"Logistic Regression Pre-scaling Precision Score: {precision_score_LReg_PreScale}")
+print(f"Confusion Matrix for Logistic Regression Pre-scaling: \n{cnf_matrix_PreScale_LReg}")
+
+class_names = ['Malignant', 'Benign']
 
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 #Regression scaled so that all features try to equally impact the model, and allows convergence
 
-LReg = LogisticRegression(random_state=55, max_iter=1000)
 LReg.fit(X_train_scaled, Y_train)
 
 y_pred_LReg = LReg.predict(X_test_scaled)
-print(y_pred_LReg)
+#print(y_pred_LReg)
 
 accuracy_score_LReg = accuracy_score(Y_test, y_pred_LReg)
+precision_score_LReg = precision_score(Y_test, y_pred_LReg)
+recall_score_LReg = recall_score(Y_test, y_pred_LReg)
 print(f"Logistic Regression Accuracy: {accuracy_score_LReg}")
-
-#Accuracy
-#ROC/AUC Plots
-#Feature Analysis and Interpretation
-#Write code for Random Forest and Gradient Boosting
+print(f"Logistic Regression Recall Score: {recall_score_LReg}")
+print(f"Logistic Regression Precision Score: {precision_score_LReg}")
 
 cnf_matrix_LReg = metrics.confusion_matrix(Y_test, y_pred_LReg)
 print(f"Confusion Matrix for Logistic Regression: \n{cnf_matrix_LReg}")
 
+classification_report_LReg_PreScaled = classification_report(Y_test, y_pred_LReg, target_names=class_names)
+print(f"Classification report for Logistic Regression Pre-Scaled: \n")
+print(classification_report_LReg_PreScaled)
+
 #Confusion Matrix Plots
-class_names = ['Malignant', 'Benign']
+
 fig, ax = plt.subplots()
 tick_marks = np.arange(len(class_names))
 plt.xticks(tick_marks, class_names)
@@ -81,17 +86,24 @@ plt.xlabel('Predicted Label')
 #plt.show()
 
 #Classification Report
-print(f"Classification report for Logistic Regression: \n{classification_report(Y_test, y_pred_LReg, target_names=class_names)}")
+classification_report_LReg = classification_report(Y_test, y_pred_LReg, target_names=class_names)
+print(f"Classification report for Logistic Regression: \n")
+print(classification_report_LReg)
 
 #Random Forest Code
 rf = RandomForestClassifier()
 rf.fit(X_train, Y_train)
 
 y_pred_rf = rf.predict(X_test)
-print(f"Y Predictions for Random Forest Classifier: {y_pred_rf}")
+#print(f"Y Predictions for Random Forest Classifier: {y_pred_rf}")
 
+print("Stats for Pre Hyperparameter tuning Random Forest Classifier")
 accuracy_score_rf = accuracy_score(Y_test, y_pred_rf)
+precision_score_rf = precision_score(Y_test, y_pred_rf)
+recall_score_rf = recall_score(Y_test, y_pred_rf)
 print(f"Random Forest Classifier Accuracy: {accuracy_score_rf}")
+print(f"Random Forest Classifier Precision: {precision_score_rf}")
+print(f"Random Forest Classifier recall score: {recall_score_rf}")
 
 cnf_matrix_rf = metrics.confusion_matrix(Y_test, y_pred_rf)
 print(f"Confusion Matrix for Random Forests: \n{cnf_matrix_rf}")
@@ -166,16 +178,16 @@ best_rf_RS.fit(X_train, Y_train)
 y_pred_best_rf_RS = best_rf_RS.predict(X_test)
 
 accuracy_score_best_rf_RS = accuracy_score(Y_test, y_pred_best_rf_RS)
-print(f"Best RF accuracy score: {accuracy_score_best_rf_RS}")
+print(f"Best RF with hyperparameter tuning accuracy score: {accuracy_score_best_rf_RS}")
 
 precision_score_best_rf_RS = precision_score(Y_test, y_pred_best_rf_RS)
-print(f"Best RF precision score: {precision_score_best_rf_RS}")
+print(f"Best RF with hyperparameter tuning precision score: {precision_score_best_rf_RS}")
 
 recall_score_best_rf_RS = recall_score(Y_test, y_pred_best_rf_RS)
-print(f"Best RF Recall score: {recall_score_best_rf_RS}")
+print(f"Best RF with hyperparameter tuning Recall score: {recall_score_best_rf_RS}")
 
 cnf_matrix_best_rf_RS = metrics.confusion_matrix(Y_test, y_pred_best_rf_RS)
-print(f"Best RF Confusion Matrix: \n{cnf_matrix_best_rf_RS}")
+print(f"Best RF with hyperparameter tuning Confusion Matrix: \n{cnf_matrix_best_rf_RS}")
 
 #Confusion Matrix Plot
 ConfusionMatrixDisplay(confusion_matrix=cnf_matrix_best_rf_RS).plot()
@@ -195,3 +207,9 @@ GBoost_report = classification_report(Y_test, Y_pred_GradientBoosting)
 print(f"Classification Report \n")
 print(GBoost_report)
 print(f"GBoost accuracy: {accuracy_score(Y_test, Y_pred_GradientBoosting)}")
+print(f"GBoost precision: {precision_score(Y_test, Y_pred_GradientBoosting)}")
+print(f"GBoost recall: {recall_score(Y_test, Y_pred_GradientBoosting)}")
+
+GBoost_cnf_matrix = metrics.confusion_matrix(Y_test, Y_pred_GradientBoosting)
+print(f"GBoost confusion matrix: ")
+print(GBoost_cnf_matrix)
