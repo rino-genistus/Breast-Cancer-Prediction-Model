@@ -1,6 +1,7 @@
 A Machine Learning study that classified Breat Tumors as Malignant or Benign using the Wisconsin Breast Cancer Dataset(539 samples, 30 diagnostic features including radius, texture, perimeter, area, smoothness, compactness and concavity statistics)
 
-**Models Implemented**
+**Models Implemented**:
+
 For all three of models, the Confusion Matrix, accuracy, and precision was calculated and displayed.
 
 Logistic Regression: Evaluated both pre and post feature scaling using StandardScaler, showing the impact of normalization on model convergence and performance. 
